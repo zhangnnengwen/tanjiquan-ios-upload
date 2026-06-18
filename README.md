@@ -1,30 +1,40 @@
 # Tanjiquan iOS Upload
 
-This repository uploads the HBuilderX-generated IPA to App Store Connect using GitHub Actions on macOS.
+This repository uploads the HBuilderX-generated IPA to App Store Connect from a macOS CI runner.
 
-The IPA is committed only in encrypted form so the repository can be public and use free GitHub-hosted runners.
+The IPA is committed only in encrypted form. The plaintext IPA, `.p8` private key, and generated API key JSON files must never be committed.
 
-## Required GitHub Secrets
+## Recommended: Codemagic
 
-In the GitHub repository, open `Settings -> Secrets and variables -> Actions -> New repository secret` and add:
+Use Codemagic when GitHub Actions is blocked by billing.
+
+1. Sign in to Codemagic.
+2. Add this GitHub repository as an app.
+3. Open the app settings and go to `Environment variables`.
+4. Add these variables into a group named `appstore_credentials`.
+5. Mark every sensitive value as secret.
 
 - `ASC_KEY_ID`: `Q4SMAPYNPY`
 - `ASC_ISSUER_ID`: `f17b826e-39c5-48e8-a2ba-f8f2f6f04396`
 - `ASC_PRIVATE_KEY`: the full contents of `AuthKey_Q4SMAPYNPY.p8`, including the `BEGIN PRIVATE KEY` and `END PRIVATE KEY` lines
 - `IPA_DECRYPT_PASSWORD`: the password used to decrypt `ipa/__UNI__15CD4B6_0618111726.ipa.enc`
 
-Do not commit `.p8`, API key JSON files, plaintext `.ipa` files, or Apple account passwords.
+Then start workflow `Upload iOS IPA to App Store Connect` from Codemagic.
 
-## Run Upload
+## GitHub Actions Backup
 
-After pushing this repository to GitHub:
+The `.github/workflows/upload-ios.yml` workflow does the same upload on GitHub Actions. Use it only if the GitHub account can start macOS runners.
 
-1. Open the repository on GitHub.
-2. Go to `Actions`.
-3. Select `Upload iOS IPA`.
-4. Click `Run workflow`.
+Required GitHub repository secrets:
 
-The workflow decrypts `ipa/__UNI__15CD4B6_0618111726.ipa.enc` on the macOS runner and uploads it for bundle ID `com.aihirehumans.tanjiquan`.
+- `ASC_KEY_ID`
+- `ASC_ISSUER_ID`
+- `ASC_PRIVATE_KEY`
+- `IPA_DECRYPT_PASSWORD`
+
+## Upload Behavior
+
+Both CI workflows decrypt `ipa/__UNI__15CD4B6_0618111726.ipa.enc` on a macOS runner and upload it for bundle ID `com.aihirehumans.tanjiquan`.
 
 ## Update IPA Later
 
@@ -35,4 +45,4 @@ $env:IPA_DECRYPT_PASSWORD = "the same password stored in GitHub Secrets"
 & "C:\Ruby33-x64\bin\ruby.exe" scripts\encrypt_ipa.rb "C:\path\YourApp.ipa" "ipa\YourApp.ipa.enc"
 ```
 
-Then update `IPA_ENC_PATH` and `IPA_PATH` in `.github/workflows/upload-ios.yml` if the filename changes.
+Then update `IPA_ENC_PATH` and `IPA_PATH` in `codemagic.yaml` and `.github/workflows/upload-ios.yml` if the filename changes.

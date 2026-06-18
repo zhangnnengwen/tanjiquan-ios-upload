@@ -1,0 +1,42 @@
+workflows:
+  upload-ios-ipa:
+    name: Upload iOS IPA to App Store Connect
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      groups:
+        - appstore_credentials
+      vars:
+        IPA_ENC_PATH: ipa/__UNI__15CD4B6_0618111726.ipa.enc
+        IPA_PATH: /tmp/__UNI__15CD4B6_0618111726.ipa
+        APP_IDENTIFIER: com.aihirehumans.tanjiquan
+    scripts:
+      - name: Verify encrypted IPA
+        script: |
+          test -f "$IPA_ENC_PATH"
+          ls -lh "$IPA_ENC_PATH"
+      - name: Install fastlane
+        script: |
+          gem install fastlane -NV
+          fastlane --version
+      - name: Create App Store Connect API key file
+        script: |
+          ruby -rjson -e 'File.write("api_key.json", JSON.pretty_generate({
+            key_id: ENV.fetch("ASC_KEY_ID"),
+            issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+            key: ENV.fetch("ASC_PRIVATE_KEY"),
+            duration: 1200,
+            in_house: false
+          }))'
+      - name: Decrypt IPA
+        script: |
+          ruby scripts/decrypt_ipa.rb "$IPA_ENC_PATH" "$IPA_PATH"
+          test -f "$IPA_PATH"
+          ls -lh "$IPA_PATH"
+      - name: Upload IPA to App Store Connect
+        script: |
+          fastlane pilot upload \
+            --ipa "$IPA_PATH" \
+            --api_key_path "api_key.json" \
+            --app_identifier "$APP_IDENTIFIER" \
+            --skip_waiting_for_build_processing true
