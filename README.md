@@ -36,6 +36,19 @@ Required GitHub repository secrets:
 
 Both CI workflows decrypt `ipa/__UNI__15CD4B6_0618111726.ipa.enc` on a macOS runner and upload it for bundle ID `com.aihirehumans.tanjiquan`.
 
+## One-click Update From Windows
+
+For the next HBuilderX IPA:
+
+1. Build a new `.ipa` in HBuilderX.
+2. Make sure the iOS build number is higher than the previous upload.
+3. Double-click `upload-new-ipa.bat`.
+4. Drag the new `.ipa` file into the PowerShell window and press Enter.
+5. Paste `IPA_DECRYPT_PASSWORD` when prompted.
+6. After the helper pushes to GitHub, open Codemagic and click `Start new build`.
+
+The helper encrypts the IPA, commits only `ipa/__UNI__15CD4B6_0618111726.ipa.enc`, and pushes `main` to GitHub.
+
 ## Update IPA Later
 
 Set `IPA_DECRYPT_PASSWORD` locally, encrypt the new IPA, commit the `.ipa.enc` file, and push.
