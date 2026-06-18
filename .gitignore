@@ -1,0 +1,10 @@
+api_key.json
+*.p8
+*api_key*.json
+*.bad-backup
+*.invalid-generated
+*.ipa
+!ipa/*.ipa.enc
+.DS_Store
+metadata/
+screenshots/
