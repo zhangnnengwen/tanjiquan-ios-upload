@@ -45,7 +45,7 @@ For the next HBuilderX IPA:
 3. Double-click `upload-new-ipa.bat`.
 4. Drag the new `.ipa` file into the PowerShell window and press Enter.
 5. Paste `IPA_DECRYPT_PASSWORD` when prompted.
-6. After the helper pushes to GitHub, open Codemagic and click `Start new build`.
+6. After the helper pushes to GitHub, Codemagic starts the upload workflow automatically.
 
 The helper encrypts the IPA, commits only `ipa/__UNI__15CD4B6_0618111726.ipa.enc`, and pushes `main` to GitHub.
 
